@@ -6,14 +6,14 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
-import prisma from '@/lib/db'
+import { getData } from '@/lib/test'
 import Link from 'next/link'
 
 const TasksPage = async () => {
-  const tasks = await prisma.task.findMany()
+  const tasks = await getData()
   return (
     <main className='grid grid-cols-3 gap-4'>
-      {tasks.map((task) => (
+      {tasks?.map((task) => (
         <Link href={`/tasks/${task.id}`} key={task.id}>
           <Card key={task.id}>
             <CardHeader>

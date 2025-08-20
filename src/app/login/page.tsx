@@ -23,6 +23,8 @@ import {
 import { FaEye, FaEyeSlash, FaGithub, FaGoogle } from 'react-icons/fa'
 import { useState } from 'react'
 import Link from 'next/link'
+import LoginWithGithub from '@/components/auth/LoginWithGithub'
+import LoginWithGoogle from '@/components/auth/LoginWithGoogle'
 
 const loginFormSchema = z.object({
   email: z.email(),
@@ -53,17 +55,11 @@ const LoginPage = () => {
           <CardTitle className='text-2xl font-bold'>Welcome Back!</CardTitle>
           <CardDescription>Login to your account</CardDescription>
         </CardHeader>
+
         <CardContent className='space-y-4'>
           <div className='flex items-center gap-4'>
-            <Button variant='outline' className='flex-1'>
-              <FaGoogle className='size-5' /> {/* size in number, not 'px' */}
-              <div>Google</div>
-            </Button>
-
-            <Button className='flex-1' variant={'outline'}>
-              <FaGithub />
-              Github
-            </Button>
+            <LoginWithGoogle />
+            <LoginWithGithub />
           </div>
           <Form {...form}>
             <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit)}>

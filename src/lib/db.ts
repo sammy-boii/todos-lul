@@ -12,10 +12,6 @@ declare const globalThis: {
   prismaGlobal: ReturnType<typeof prismaSingleton>
 }
 
-// const globalForPrisma = global as unknown as {
-//   prisma?: PrismaClient
-// }
-
 const prisma = globalThis.prismaGlobal ?? prismaSingleton()
 
 export default prisma

@@ -26,6 +26,8 @@ import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { RxCross1 } from 'react-icons/rx'
 import clsx from 'clsx'
+import LoginWithGoogle from '@/components/auth/LoginWithGoogle'
+import LoginWithGithub from '@/components/auth/LoginWithGithub'
 
 const signupFormSchema = z
   .object({
@@ -79,15 +81,8 @@ const SignUpPage = () => {
         </CardHeader>
         <CardContent className='space-y-4'>
           <div className='flex items-center gap-4'>
-            <Button variant='outline' className='flex-1'>
-              <FaGoogle className='size-5' />
-              <div>Google</div>
-            </Button>
-
-            <Button className='flex-1' variant={'outline'}>
-              <FaGithub />
-              Github
-            </Button>
+            <LoginWithGoogle />
+            <LoginWithGithub />
           </div>
           <Form {...form}>
             <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit)}>
