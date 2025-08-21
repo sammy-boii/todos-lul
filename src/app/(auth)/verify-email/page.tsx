@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { Suspense, useState, useTransition } from 'react'
 import {
   Card,
   CardContent,
@@ -16,18 +16,21 @@ import {
 } from '@/components/ui/input-otp'
 import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 
-const VerifyEmailPage = () => {
+const VerifyEmailPage = ({
+  searchParams
+}: {
+  searchParams: Promise<{ email?: string }>
+}) => {
   const [otp, setOtp] = useState('')
   const [pending, startTransition] = useTransition()
-  const searchParams = useSearchParams()
-  const email = searchParams.get('email')
   const router = useRouter()
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    const { email } = await searchParams
     if (!email) {
       return toast.error('Please provide an email address.')
     }
@@ -35,7 +38,7 @@ const VerifyEmailPage = () => {
       await authClient.emailOtp.checkVerificationOtp({
         email,
         otp,
-        type: 'sign-in',
+        type: 'email-verification',
         fetchOptions: {
           onSuccess: () => {
             toast.success('Email verified successfully!')

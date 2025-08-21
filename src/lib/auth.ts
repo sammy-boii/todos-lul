@@ -27,16 +27,14 @@ export const auth = betterAuth({
     emailOTP({
       async sendVerificationOTP({ email, otp, type }) {
         if (type === 'sign-in') {
+        } else if (type === 'email-verification') {
           await resend.emails.send({
             from: 'TodoApp <onboarding@resend.dev>',
             to: [email],
             subject: 'Your Verification Code',
             react: EmailTemplate({ otp })
           })
-        } else if (type === 'email-verification') {
-          // Send the OTP for email verification
         } else {
-          // Send the OTP for password reset
         }
       }
     })

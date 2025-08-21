@@ -31,7 +31,6 @@ import LoginWithGithub from '@/components/auth/LoginWithGithub'
 import { authClient } from '@/lib/auth-client'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
-import { useFormStatus } from 'react-dom'
 
 const signupFormSchema = z
   .object({
@@ -72,7 +71,7 @@ const SignUpPage = () => {
   async function onSubmit(formData: TSignUpForm) {
     await authClient.emailOtp.sendVerificationOtp({
       email: formData.email,
-      type: 'sign-in',
+      type: 'email-verification',
       fetchOptions: {
         onSuccess: () => {
           router.push(`/verify-email?email=${formData.email}`)
