@@ -1,7 +1,10 @@
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
+import { emailOTP } from 'better-auth/plugins'
 
 import prisma from './db'
+import { resend } from './resend'
+import EmailTemplate from '@/components/misc/EmailTemplate'
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -19,5 +22,23 @@ export const auth = betterAuth({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
     }
-  }
+  },
+  plugins: [
+    emailOTP({
+      async sendVerificationOTP({ email, otp, type }) {
+        if (type === 'sign-in') {
+          await resend.emails.send({
+            from: 'TodoApp <onboarding@resend.dev>',
+            to: [email],
+            subject: 'Your Verification Code',
+            react: EmailTemplate({ otp })
+          })
+        } else if (type === 'email-verification') {
+          // Send the OTP for email verification
+        } else {
+          // Send the OTP for password reset
+        }
+      }
+    })
+  ]
 })

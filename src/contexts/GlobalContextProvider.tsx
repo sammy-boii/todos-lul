@@ -6,6 +6,8 @@ import { ThemeProvider } from 'next-themes'
 import { useState } from 'react'
 
 const GlobalContextProvider = ({ children }: { children: React.ReactNode }) => {
+  // lazy initialization
+  // not wrapping it inside a fn would trigger an eager evaluation and cause it to be created on every render
   const [queryClient] = useState(() => new QueryClient())
   return (
     <QueryClientProvider client={queryClient}>

@@ -10,7 +10,7 @@ const Navbar = () => {
   const { data } = useSession()
 
   return (
-    <nav className='w-screen flex justify-between items-center p-4 text-white'>
+    <nav className='max-w-screen flex justify-between items-center p-4 text-white'>
       <ThemeToggle />
       {data?.user ? (
         <Logout />

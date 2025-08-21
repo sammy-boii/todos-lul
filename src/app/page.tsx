@@ -1,5 +1,6 @@
 'use client'
 
+import EmailTemplate from '@/components/misc/EmailTemplate'
 import { useSession } from '@/lib/auth-client'
 
 const Home = () => {

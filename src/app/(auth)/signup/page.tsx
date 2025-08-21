@@ -20,7 +20,7 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
-import { FaCheck, FaEye, FaEyeSlash, FaGithub, FaGoogle } from 'react-icons/fa'
+import { FaCheck, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { useState } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
@@ -28,6 +28,10 @@ import { RxCross1 } from 'react-icons/rx'
 import clsx from 'clsx'
 import LoginWithGoogle from '@/components/auth/LoginWithGoogle'
 import LoginWithGithub from '@/components/auth/LoginWithGithub'
+import { authClient } from '@/lib/auth-client'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
+import { useFormStatus } from 'react-dom'
 
 const signupFormSchema = z
   .object({
@@ -53,6 +57,8 @@ const signupFormSchema = z
 type TSignUpForm = z.infer<typeof signupFormSchema>
 
 const SignUpPage = () => {
+  const router = useRouter()
+
   const form = useForm<TSignUpForm>({
     resolver: zodResolver(signupFormSchema),
     defaultValues: {
@@ -63,15 +69,28 @@ const SignUpPage = () => {
     }
   })
 
-  function onSubmit(data: TSignUpForm) {
-    console.log('Form submitted:', data)
+  async function onSubmit(formData: TSignUpForm) {
+    await authClient.emailOtp.sendVerificationOtp({
+      email: formData.email,
+      type: 'sign-in',
+      fetchOptions: {
+        onSuccess: () => {
+          router.push(`/verify-email?email=${formData.email}`)
+        },
+        onError: () => {
+          toast.error(
+            'An error occurred while sending the OTP. Please try again.'
+          )
+        }
+      }
+    })
   }
 
   const [showPassword, setShowPassword] = useState(false)
   const passwordError = form.formState.errors.password
 
   return (
-    <main>
+    <main className='mb-12'>
       <Card className='max-w-md mx-auto'>
         <CardHeader>
           <CardTitle className='text-2xl font-bold'>
@@ -104,7 +123,7 @@ const SignUpPage = () => {
                 name='email'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username</FormLabel>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input placeholder='example@email.com' {...field} />
                     </FormControl>
@@ -174,7 +193,11 @@ const SignUpPage = () => {
                 )}
               />
 
-              <Button className='w-full cursor-pointer' type='submit'>
+              <Button
+                disabled={form.formState.isSubmitting}
+                className='w-full cursor-pointer'
+                type='submit'
+              >
                 Sign Up
               </Button>
             </form>
