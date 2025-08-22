@@ -1,17 +1,16 @@
-// 'use server'
+'use server'
 
-// import { auth } from '@/lib/auth'
+import prisma from '@/lib/db'
 
-// export const signUp = async (formData: {
-//   name: string
-//   email: string
-//   password: string
-// }) => {
-//   await auth.api.signUpEmail({
-//     body: {
-//       name: formData.name,
-//       email: formData.email,
-//       password: formData.password
-//     }
-//    })
-// }
+export async function getUsers() {
+  try {
+    const users = await prisma.user.findMany({
+      orderBy: {
+        name: 'asc'
+      }
+    })
+    return { data: users }
+  } catch (err) {
+    return { error: 'Failed to fetch users' }
+  }
+}

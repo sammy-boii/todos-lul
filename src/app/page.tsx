@@ -1,12 +1,16 @@
+import { getUsers } from '@/actions/user.actions'
 import { Badge } from '@/components/ui/badge'
 import prisma from '@/lib/db'
 
 const Home = async () => {
-  const users = await prisma.user.findMany({
-    orderBy: {
-      name: 'asc'
-    }
-  })
+  const { data: users } = await getUsers()
+  if (!users) {
+    return (
+      <h2 className='text-center text-2xl font-bold text-red-500'>
+        Failed to fetch users
+      </h2>
+    )
+  }
   return (
     <table className='mt-6 max-w-[95vw] w-full mx-auto border-collapse'>
       <thead className='bg-muted font-bold'>
