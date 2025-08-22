@@ -23,11 +23,10 @@ import {
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import { useState } from 'react'
 import Link from 'next/link'
-import LoginWithGithub from '@/components/auth/LoginWithGithub'
-import LoginWithGoogle from '@/components/auth/LoginWithGoogle'
 import { toast } from 'sonner'
 import { authClient } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
+import OAuthLoginButton from '@/components/auth/OAuthLoginButton'
 
 const loginFormSchema = z.object({
   email: z.email(),
@@ -82,8 +81,8 @@ const LoginPage = () => {
 
         <CardContent className='space-y-4'>
           <div className='flex items-center gap-4'>
-            <LoginWithGoogle />
-            <LoginWithGithub />
+            <OAuthLoginButton provider='google' />
+            <OAuthLoginButton provider='github' />
           </div>
           <Form {...form}>
             <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit)}>

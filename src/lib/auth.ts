@@ -10,6 +10,7 @@ import { nextCookies } from 'better-auth/next-js'
 import { VALID_DOMAINS } from './constants'
 import { normalizeName } from './utils'
 import { UserRole } from '@/generated/prisma'
+import { sendEmailAction } from '@/actions/email.actions'
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -17,8 +18,14 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    minPasswordLength: 12
+    minPasswordLength: 12,
+    // autoSignIn: false
+    requireEmailVerification: true
   },
+  emailVerification: {
+    sendOnSignUp: true
+  },
+
   session: {
     expiresIn: 60 * 60 * 24 * 30 // 30 days
   },
@@ -83,12 +90,7 @@ export const auth = betterAuth({
     emailOTP({
       async sendVerificationOTP({ email, otp, type }) {
         if (type === 'sign-in') {
-          await resend.emails.send({
-            from: 'TodoApp <onboarding@resend.dev>',
-            to: [email],
-            subject: 'Your Verification Code',
-            react: EmailTemplate({ otp })
-          })
+          await sendEmailAction(email, otp)
         } else if (type === 'email-verification') {
         } else {
         }

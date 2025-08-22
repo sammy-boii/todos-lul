@@ -26,11 +26,10 @@ import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { RxCross1 } from 'react-icons/rx'
 import clsx from 'clsx'
-import LoginWithGoogle from '@/components/auth/LoginWithGoogle'
-import LoginWithGithub from '@/components/auth/LoginWithGithub'
 import { authClient } from '@/lib/auth-client'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import OAuthLoginButton from '@/components/auth/OAuthLoginButton'
 
 const signupFormSchema = z
   .object({
@@ -80,8 +79,18 @@ const SignUpPage = () => {
           onError: (ctx) => {
             toast.error(ctx.error.message)
           },
-          onSuccess: () => {
-            toast.success('Sign In successful')
+          onSuccess: async () => {
+            const { error } = await authClient.emailOtp.sendVerificationOtp({
+              type: 'sign-in',
+              email: formData.email
+            })
+
+            if (error) {
+              throw error
+            }
+
+            toast.success('Email verification sent. Please check your inbox.')
+            router.push(`/verify-email?email=${formData.email}`)
           }
         }
       )
@@ -104,8 +113,8 @@ const SignUpPage = () => {
         </CardHeader>
         <CardContent className='space-y-4'>
           <div className='flex items-center gap-4'>
-            <LoginWithGoogle />
-            <LoginWithGithub />
+            <OAuthLoginButton provider='google' />
+            <OAuthLoginButton provider='github' />
           </div>
           <Form {...form}>
             <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit)}>

@@ -15,8 +15,8 @@ const Logout = () => {
           router.replace('/login')
           toast.success('Successfully logged out.')
         },
-        onError: (ctx) => {
-          toast.error(ctx.error.message)
+        onError: () => {
+          toast.error('Something went wrong. Please try again.')
         }
       }
     })
