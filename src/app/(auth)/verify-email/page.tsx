@@ -43,8 +43,8 @@ const VerifyEmailPage = ({
         otp,
         fetchOptions: {
           onSuccess: () => {
-            toast.success('Email verified successfully!')
             router.push('/')
+            toast.success('Email verified successfully!')
           },
           onError: () => {
             toast.error('Error verifying email. Please try again.')
