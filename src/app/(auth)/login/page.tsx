@@ -20,11 +20,14 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
-import { FaEye, FaEyeSlash, FaGithub, FaGoogle } from 'react-icons/fa'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import { useState } from 'react'
 import Link from 'next/link'
 import LoginWithGithub from '@/components/auth/LoginWithGithub'
 import LoginWithGoogle from '@/components/auth/LoginWithGoogle'
+import { toast } from 'sonner'
+import { authClient } from '@/lib/auth-client'
+import { useRouter } from 'next/navigation'
 
 const loginFormSchema = z.object({
   email: z.email(),
@@ -34,6 +37,8 @@ const loginFormSchema = z.object({
 type TLoginForm = z.infer<typeof loginFormSchema>
 
 const LoginPage = () => {
+  const router = useRouter()
+
   const form = useForm<TLoginForm>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -42,8 +47,27 @@ const LoginPage = () => {
     }
   })
 
-  function onSubmit(data: TLoginForm) {
-    console.log('Form submitted:', data)
+  async function onSubmit(data: TLoginForm) {
+    try {
+      await authClient.signIn.email(
+        {
+          email: data.email,
+          password: data.password
+        },
+
+        {
+          onSuccess: () => {
+            router.replace('/')
+            toast.success('Logged in successfully.')
+          },
+          onError: (ctx) => {
+            toast.error(ctx.error.message)
+          }
+        }
+      )
+    } catch (err) {
+      toast.error('An error occurred. Please try again.')
+    }
   }
 
   const [showPassword, setShowPassword] = useState(false)
@@ -115,7 +139,11 @@ const LoginPage = () => {
                   Forgot Password?
                 </Link>
               </div>
-              <Button className='w-full cursor-pointer' type='submit'>
+              <Button
+                disabled={form.formState.isSubmitting}
+                className='w-full cursor-pointer'
+                type='submit'
+              >
                 Login
               </Button>
             </form>

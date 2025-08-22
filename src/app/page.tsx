@@ -1,11 +1,41 @@
-'use client'
+import { Badge } from '@/components/ui/badge'
+import prisma from '@/lib/db'
 
-import EmailTemplate from '@/components/misc/EmailTemplate'
-import { useSession } from '@/lib/auth-client'
+const Home = async () => {
+  const users = await prisma.user.findMany({
+    orderBy: {
+      name: 'asc'
+    }
+  })
+  return (
+    <table className='mt-6 max-w-[95vw] w-full mx-auto border-collapse'>
+      <thead className='bg-muted font-bold'>
+        <tr>
+          <th className='px-6 py-2 text-left'>ID</th>
+          <th className='px-6 py-2 text-left'>Name</th>
+          <th className='px-6 py-2 text-left'>Email</th>
+          <th className='px-6 py-2 text-right'>Role</th>
+        </tr>
+      </thead>
 
-const Home = () => {
-  const { data, isPending } = useSession()
-
-  return <div>{isPending ? 'Loading...' : JSON.stringify(data, null, 2)}</div>
+      <tbody>
+        {users.map((user) => (
+          <tr key={user.id} className='border-t'>
+            <td className='px-6 py-2'>{user.id.slice(0, 6)}</td>
+            <td className='px-6 py-2'>{user.name}</td>
+            <td className='px-6 py-2'>{user.email}</td>
+            <td className='px-4 py-2 text-right'>
+              <Badge
+                variant={user.role === 'ADMIN' ? 'destructive' : 'secondary'}
+              >
+                {user.role}
+              </Badge>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
 }
+
 export default Home

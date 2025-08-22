@@ -38,7 +38,7 @@ const VerifyEmailPage = ({
       await authClient.emailOtp.checkVerificationOtp({
         email,
         otp,
-        type: 'email-verification',
+        type: 'sign-in',
         fetchOptions: {
           onSuccess: () => {
             toast.success('Email verified successfully!')
@@ -46,7 +46,6 @@ const VerifyEmailPage = ({
           },
           onError: (error) => {
             toast.error('Error verifying email. Please try again.')
-            console.log(error)
           }
         }
       })

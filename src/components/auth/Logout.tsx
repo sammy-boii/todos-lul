@@ -7,12 +7,16 @@ import { useRouter } from 'next/navigation'
 
 const Logout = () => {
   const router = useRouter()
+
   async function signOut() {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          toast.success('Successfully logged out.')
           router.replace('/login')
+          toast.success('Successfully logged out.')
+        },
+        onError: (ctx) => {
+          toast.error(ctx.error.message)
         }
       }
     })

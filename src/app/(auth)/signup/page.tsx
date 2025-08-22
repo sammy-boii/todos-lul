@@ -69,20 +69,25 @@ const SignUpPage = () => {
   })
 
   async function onSubmit(formData: TSignUpForm) {
-    await authClient.emailOtp.sendVerificationOtp({
-      email: formData.email,
-      type: 'email-verification',
-      fetchOptions: {
-        onSuccess: () => {
-          router.push(`/verify-email?email=${formData.email}`)
+    try {
+      await authClient.signUp.email(
+        {
+          email: formData.email,
+          password: formData.password,
+          name: formData.username
         },
-        onError: () => {
-          toast.error(
-            'An error occurred while sending the OTP. Please try again.'
-          )
+        {
+          onError: (ctx) => {
+            toast.error(ctx.error.message)
+          },
+          onSuccess: () => {
+            toast.success('Sign In successful')
+          }
         }
-      }
-    })
+      )
+    } catch (error) {
+      toast.error('An error occurred. Please try again.')
+    }
   }
 
   const [showPassword, setShowPassword] = useState(false)
