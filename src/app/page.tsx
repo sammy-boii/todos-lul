@@ -1,6 +1,5 @@
 import { getUsers } from '@/actions/user.actions'
 import { Badge } from '@/components/ui/badge'
-import prisma from '@/lib/db'
 
 const Home = async () => {
   const { data: users } = await getUsers()

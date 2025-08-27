@@ -6,11 +6,18 @@ export async function getUsers() {
   try {
     const users = await prisma.user.findMany({
       orderBy: {
-        name: 'asc'
+        createdAt: 'desc'
       }
     })
     return { data: users }
   } catch (err) {
-    return { error: 'Failed to fetch users' }
+    if (err instanceof Error) {
+      return {
+        error: err.message
+      }
+    }
+    return {
+      error: 'Failed to fetch users'
+    }
   }
 }

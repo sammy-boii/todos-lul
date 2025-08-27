@@ -1,3 +1,7 @@
+export const dynamic = 'force-dynamic'
+
+import { getTasks } from '@/actions/tasks.actions'
+import { getUsers } from '@/actions/user.actions'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -6,11 +10,10 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
-import { getData } from '@/lib/test'
 import Link from 'next/link'
 
 const TasksPage = async () => {
-  const tasks = await getData()
+  const { data: tasks, error } = await getTasks()
   return (
     <main className='grid grid-cols-3 gap-4'>
       {tasks?.map((task) => (
