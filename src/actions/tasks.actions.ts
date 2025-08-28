@@ -26,6 +26,20 @@ export const getTasks = async () => {
   }, 'fetching tasks')
 }
 
+export const getTask = async (slug: string) => {
+  return tryCatch(async () => {
+    const tasks = await prisma.task.findUnique({
+      where: {
+        slug
+      },
+      include: {
+        author: true
+      }
+    })
+    return tasks
+  })
+}
+
 export const createTask = async (task: Partial<Task>) => {
   return tryCatch(async () => {
     const user = await getSession()

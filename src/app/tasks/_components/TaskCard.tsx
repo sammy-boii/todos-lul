@@ -9,8 +9,11 @@ import { useTransition } from 'react'
 
 import { toast } from 'sonner'
 import { ActionType } from './OptimisticTasks'
-import ViewTaskDialog from './ViewTaskDialog'
 import { TaskWithAuthor } from '@/types/task.types'
+import Link from 'next/link'
+import { Eye } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import clsx from 'clsx'
 
 interface TaskCardProps {
   task: TaskWithAuthor
@@ -53,9 +56,22 @@ const TaskCard = ({ setOptimisticTasks, task }: TaskCardProps) => {
               aria-label='Toggle completed'
             />
             <div className='min-w-0'>
-              <div className='font-semibold truncate'>{task.title}</div>
-              <p className='text-muted-foreground text-sm line-clamp-2'>
-                {task.description}
+              <div
+                className={clsx(
+                  'font-semibold truncate',
+
+                  task.completed && 'line-through'
+                )}
+              >
+                {task.title}
+              </div>
+              <p
+                className={clsx(
+                  'text-muted-foreground text-sm line-clamp-2',
+                  task.completed && 'line-through'
+                )}
+              >
+                {task.description || 'No description'}
               </p>
             </div>
           </div>
@@ -68,7 +84,12 @@ const TaskCard = ({ setOptimisticTasks, task }: TaskCardProps) => {
         </section>
 
         <section className='flex items-center gap-2 ml-auto'>
-          <ViewTaskDialog task={task} />
+          <Link
+            className='rounded-md p-2 hover:opacity-70 bg-accent text-white'
+            href={`/tasks/${task.slug}`}
+          >
+            <Eye size={22} />
+          </Link>
           <EditTaskForm setOptimisticTasks={setOptimisticTasks} task={task} />
           <DeleteTask setOptimisticTasks={setOptimisticTasks} id={task.id} />
         </section>
