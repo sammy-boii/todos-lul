@@ -5,37 +5,37 @@ import { Card, CardContent } from '@/components/ui/card'
 import { EditTaskForm } from './EditTaskForm'
 import DeleteTask from './DeleteTask'
 import { toggleTaskCompleted } from '@/actions/tasks.actions'
-import { useTransition, useState } from 'react'
-import { Eye } from 'lucide-react'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
-import { toast } from 'sonner'
+import { useTransition } from 'react'
 
-interface TaskCardProps extends Task {
-  author: User
+import { toast } from 'sonner'
+import { ActionType } from './OptimisticTasks'
+import ViewTaskDialog from './ViewTaskDialog'
+import { TaskWithAuthor } from '@/types/task.types'
+
+interface TaskCardProps {
+  task: TaskWithAuthor
+  setOptimisticTasks: (action: ActionType) => void
 }
 
-const TaskCard = (task: TaskCardProps) => {
+const TaskCard = ({ setOptimisticTasks, task }: TaskCardProps) => {
   const [isPending, startTransition] = useTransition()
-  const [detailsOpen, setDetailsOpen] = useState(false)
 
   const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const next = e.target.checked
-    startTransition(() => {
-      ;(async () => {
-        const { error } = await toggleTaskCompleted(task.id, next)
-        if (error) {
-          toast.error(error.message)
-        } else {
-          toast.success(next ? 'Marked as completed' : 'Marked as pending')
+    startTransition(async () => {
+      setOptimisticTasks({
+        type: 'edit',
+        id: task.id,
+        updates: {
+          completed: next
         }
-      })()
+      })
+      const { error } = await toggleTaskCompleted(task.id, next)
+      if (error) {
+        toast.error(error.message)
+      } else {
+        toast.success(next ? 'Marked as completed' : 'Marked as pending')
+      }
     })
   }
 
@@ -68,58 +68,9 @@ const TaskCard = (task: TaskCardProps) => {
         </section>
 
         <section className='flex items-center gap-2 ml-auto'>
-          <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-            <DialogTrigger asChild>
-              <button
-                className='rounded-md p-2 hover:bg-accent text-muted-foreground'
-                aria-label='View details'
-              >
-                <Eye size={18} />
-              </button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle className='flex items-center gap-2'>
-                  {task.title}
-                </DialogTitle>
-                <DialogDescription>
-                  {task.description || 'No description.'}
-                </DialogDescription>
-              </DialogHeader>
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm'>
-                <div>
-                  <div className='text-muted-foreground'>Author</div>
-                  <div className='font-medium'>
-                    {task.author?.name || 'Unknown'}
-                  </div>
-                </div>
-                <div>
-                  <div className='text-muted-foreground'>Status</div>
-                  <div className='font-medium'>
-                    {task.completed ? 'Completed' : 'Pending'}
-                  </div>
-                </div>
-                <div>
-                  <div className='text-muted-foreground'>Created</div>
-                  <div className='font-medium'>
-                    {new Date(task.createdAt).toDateString()}
-                  </div>
-                </div>
-                <div>
-                  <div className='text-muted-foreground'>Updated</div>
-                  <div className='font-medium'>
-                    {new Date(task.updatedAt).toDateString()}
-                  </div>
-                </div>
-                <div className='sm:col-span-2'>
-                  <div className='text-muted-foreground'>Slug</div>
-                  <div className='font-mono text-xs break-all'>{task.slug}</div>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-          <EditTaskForm task={task} />
-          <DeleteTask id={task.id} />
+          <ViewTaskDialog task={task} />
+          <EditTaskForm setOptimisticTasks={setOptimisticTasks} task={task} />
+          <DeleteTask setOptimisticTasks={setOptimisticTasks} id={task.id} />
         </section>
       </CardContent>
     </Card>

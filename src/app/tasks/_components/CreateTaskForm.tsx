@@ -15,14 +15,20 @@ import {
 import { createTaskSchema } from '@/schema/task.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { useState, useTransition } from 'react'
+import { useId, useState, useTransition } from 'react'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { ActionType } from './OptimisticTasks'
+import { useSession } from '@/lib/auth-client'
 
 type TCreateForm = z.infer<typeof createTaskSchema>
 
-export function CreateTaskForm() {
+export function CreateTaskForm({
+  setOptimisticTasks
+}: {
+  setOptimisticTasks: (action: ActionType) => void
+}) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -31,20 +37,29 @@ export function CreateTaskForm() {
     defaultValues: {}
   })
 
-  async function onSubmit(task: TCreateForm) {
-    startTransition(() => {
-      ;(async () => {
-        const { error } = await createTask(task)
+  const id = useId()
 
-        if (error) {
-          toast.error(error.message)
-          return
+  async function onSubmit(task: TCreateForm) {
+    startTransition(async () => {
+      setOptimisticTasks({
+        type: 'add',
+        newTask: {
+          ...task,
+          completed: false,
+          id // pass id cuz they're used as keys
         }
+      })
+      const { error } = await createTask(task)
+
+      if (error) {
+        toast.error(error.message)
+        return
+      } else {
         toast.success('Task created successfully')
         form.reset({ title: '', description: '' })
-        setOpen(false)
-      })()
+      }
     })
+    setOpen(false)
   }
 
   return (
@@ -99,10 +114,12 @@ export function CreateTaskForm() {
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant='outline'>Cancel</Button>
+              <Button className='w-18' removeLoader variant='outline'>
+                Cancel
+              </Button>
             </DialogClose>
-            <Button type='submit' disabled={isPending}>
-              {isPending ? 'Saving...' : 'Save'}
+            <Button className='w-18' type='submit' disabled={isPending}>
+              Save
             </Button>
           </DialogFooter>
         </form>

@@ -19,10 +19,16 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { editTaskSchema } from '@/schema/task.schema'
+import { ActionType } from './OptimisticTasks'
 
 type TEditForm = z.infer<typeof editTaskSchema>
 
-export function EditTaskForm({ task }: { task: TEditForm }) {
+type EditTaskFormProps = {
+  task: TEditForm
+  setOptimisticTasks: (action: ActionType) => void
+}
+
+export function EditTaskForm({ task, setOptimisticTasks }: EditTaskFormProps) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -32,18 +38,23 @@ export function EditTaskForm({ task }: { task: TEditForm }) {
   })
 
   async function onSubmit(values: TEditForm) {
-    startTransition(() => {
-      ;(async () => {
-        const { error } = await editTask(values)
+    startTransition(async () => {
+      setOptimisticTasks({
+        type: 'edit',
+        updates: values,
+        id: values.id
+      })
 
-        if (error) {
-          toast.error(error.message)
-        } else {
-          toast.success('Task updated successfully')
-          setOpen(false)
-        }
-      })()
+      const { error } = await editTask(values)
+
+      if (error) {
+        toast.error(error.message)
+      } else {
+        toast.success('Task updated successfully')
+      }
     })
+
+    setOpen(false)
   }
 
   return (
@@ -96,12 +107,17 @@ export function EditTaskForm({ task }: { task: TEditForm }) {
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant='outline' disabled={isPending}>
+              <Button
+                removeLoader
+                className='w-18'
+                variant='outline'
+                disabled={isPending}
+              >
                 Cancel
               </Button>
             </DialogClose>
-            <Button type='submit' disabled={isPending}>
-              {isPending ? 'Saving...' : 'Save'}
+            <Button className='w-18' type='submit' disabled={isPending}>
+              Save
             </Button>
           </DialogFooter>
         </form>

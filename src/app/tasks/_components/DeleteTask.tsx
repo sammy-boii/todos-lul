@@ -12,33 +12,40 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Trash2 } from 'lucide-react'
+import { Loader2, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { useState, useTransition } from 'react'
+import { useTransition } from 'react'
+import { ActionType } from './OptimisticTasks'
 
-const DeleteTask = ({ id }: { id: string }) => {
-  const [open, setOpen] = useState(false)
+interface DeleteTaskProps {
+  id: string
+  setOptimisticTasks: (action: ActionType) => void
+}
+
+const DeleteTask = ({ id, setOptimisticTasks }: DeleteTaskProps) => {
   const [isPending, startTransition] = useTransition()
 
   async function onSubmit(id: string) {
-    startTransition(() => {
-      ;(async () => {
-        const { error } = await deleteTask(id)
+    startTransition(async () => {
+      setOptimisticTasks({
+        type: 'delete',
+        id
+      })
+      const { error } = await deleteTask(id)
 
-        if (error) {
-          toast.error(error.message)
-        } else {
-          toast.success('Task deleted successfully')
-          setOpen(false)
-        }
-      })()
+      if (error) {
+        toast.error(error.message)
+      } else {
+      }
     })
+
+    toast.success('Task deleted successfully')
   }
 
   const handleSubmit = onSubmit.bind(null, id)
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
+    <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant={'destructive'}>
           <Trash2 />
@@ -53,9 +60,15 @@ const DeleteTask = ({ id }: { id: string }) => {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleSubmit} disabled={isPending}>
-            {isPending ? 'Deleting...' : 'Continue'}
+          <AlertDialogCancel className='w-18' disabled={isPending}>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            className='w-18'
+            onClick={handleSubmit}
+            disabled={isPending}
+          >
+            {isPending ? <Loader2 className='animate-spin' /> : 'Continue'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

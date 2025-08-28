@@ -15,6 +15,9 @@ export const getTasks = async () => {
       where: {
         authorId: user.id
       },
+      orderBy: {
+        title: 'asc'
+      },
       include: {
         author: true
       }
@@ -76,7 +79,8 @@ export const toggleTaskCompleted = async (id: string, completed: boolean) => {
   return tryCatch(async () => {
     const user = await getSession()
     const task = await prisma.task.findUnique({ where: { id } })
-    if (!task || task.authorId !== user.id) {
+
+    if (task?.authorId !== user.id) {
       throw new Error('Not authorized to update this task')
     }
 
