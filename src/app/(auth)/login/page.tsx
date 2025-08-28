@@ -27,6 +27,7 @@ import { toast } from 'sonner'
 import { authClient } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
 import OAuthLoginButton from '@/components/auth/OAuthLoginButton'
+import { Loader2 } from 'lucide-react'
 
 const loginFormSchema = z.object({
   email: z.email(),

@@ -1,5 +1,7 @@
+import { type Result } from '@/types'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { ZodError } from 'zod'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -14,22 +16,38 @@ export const normalizeName = (name: string) => {
     .replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
-type Success<T> = {
-  data: T
-  error: null
-}
+export async function tryCatch<T>(
+  fn: () => Promise<T>,
+  ctx?: string
+): Promise<Result<T>> {
+  try {
+    const data = await fn()
+    return { data, error: null }
+  } catch (err) {
+    if (err instanceof ZodError) {
+      return {
+        data: null,
+        error: {
+          ...err,
+          message: `${err.issues[0].message} at ${err.issues[0].path}`
+        }
+      }
+    }
 
-type Failure<E> = {
-  data: null
-  error: E
-}
+    if (err instanceof Error) {
+      return {
+        data: null,
+        error: {
+          ...err,
+          message:
+            `An error occurred ${ctx ? `while ${ctx}` : ''}: ` + err.message
+        }
+      }
+    }
 
-type Result<T, E = Error> = Success<T> | Failure<E>
-
-async function tryCatch<T, E = Error>(
-  fn: () => Promise<T>
-): Promise<Result<T, E>> {
-  const data = await fn()
-
-  return data
+    return {
+      error: new Error(`Unkown error ${ctx ? `while ${ctx}` : ''}:`),
+      data: null
+    }
+  }
 }

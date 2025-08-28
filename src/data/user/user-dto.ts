@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { TUserRole } from '@/types/user.types'
 
-export async function getCurrentUser() {
+export async function getSession() {
   const session = await auth.api.getSession({
     headers: await headers()
   })

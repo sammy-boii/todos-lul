@@ -1,23 +1,16 @@
 'use server'
 
 import prisma from '@/lib/db'
+import { tryCatch } from '@/lib/utils'
 
-export async function getUsers() {
-  try {
+export const getUsers = async () => {
+  return tryCatch(async () => {
     const users = await prisma.user.findMany({
       orderBy: {
-        createdAt: 'desc'
+        name: 'desc'
       }
     })
-    return { data: users }
-  } catch (err) {
-    if (err instanceof Error) {
-      return {
-        error: err.message
-      }
-    }
-    return {
-      error: 'Failed to fetch users'
-    }
-  }
+
+    return users
+  })
 }

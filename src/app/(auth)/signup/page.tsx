@@ -30,6 +30,7 @@ import { authClient } from '@/lib/auth-client'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import OAuthLoginButton from '@/components/auth/OAuthLoginButton'
+import { Loader2 } from 'lucide-react'
 
 const signupFormSchema = z
   .object({
@@ -211,7 +212,7 @@ const SignUpPage = () => {
                 className='w-full cursor-pointer'
                 type='submit'
               >
-                Sign Up
+                Create Account
               </Button>
             </form>
 

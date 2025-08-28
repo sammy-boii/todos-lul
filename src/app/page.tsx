@@ -2,11 +2,11 @@ import { getUsers } from '@/actions/user.actions'
 import { Badge } from '@/components/ui/badge'
 
 const Home = async () => {
-  const { data: users } = await getUsers()
-  if (!users) {
+  const { data: users, error } = await getUsers()
+  if (error) {
     return (
       <h2 className='text-center text-2xl font-bold text-red-500'>
-        Failed to fetch users
+        {error.message}
       </h2>
     )
   }

@@ -5,6 +5,7 @@ import { Button } from '../ui/button'
 import { authClient } from '@/lib/auth-client'
 import { toast } from 'sonner'
 import { useTransition } from 'react'
+import { Loader2 } from 'lucide-react'
 
 interface OAuthLoginButtonProps {
   provider: 'google' | 'github'
