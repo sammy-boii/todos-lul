@@ -7,5 +7,3 @@
 - ISR for rendering
 - Intercepting routes for /tasks/[slug]
 - Optimistic tasks
-
-Main Branch
