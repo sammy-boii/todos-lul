@@ -6,6 +6,7 @@ import { getSession } from '@/data/user/user-dto'
 import { Task } from '@/generated/prisma'
 import prisma from '@/lib/db'
 import { tryCatch } from '@/lib/utils'
+import { TaskWithAuthor } from '@/types/task.types'
 import { revalidatePath } from 'next/cache'
 
 export const getTasks = async () => {
@@ -24,6 +25,27 @@ export const getTasks = async () => {
     })
     return tasks
   }, 'fetching tasks')
+}
+
+export const getTasksForRQ = async () => {
+  try {
+    throw new Error('Oopsie')
+    const user = await getSession()
+    const tasks = await prisma.task.findMany({
+      where: {
+        authorId: user.id
+      },
+      orderBy: {
+        title: 'asc'
+      },
+      include: {
+        author: true
+      }
+    })
+    return tasks
+  } catch (err) {
+    return err as Error
+  }
 }
 
 export const getTask = async (slug: string) => {
